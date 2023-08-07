@@ -1,0 +1,61 @@
+package com.example.practice.model;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
+
+import java.time.Year;
+import java.util.Objects;
+
+@Entity
+@Getter
+@Setter
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"author_name", "released_at", "title"}))
+@NoArgsConstructor
+public class Book {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "id", nullable = false)
+    private Long id;
+
+
+    @NonNull
+    @Column(nullable = false,
+            name = "author_name")
+    private String authorName;
+
+    @NonNull
+    @Column(nullable = false,
+            name = "released_at")
+    private Year releasedAt;
+
+    @NonNull
+    @Column(nullable = false,
+            name = "title")
+    private String title;
+
+    @Column(name = "archived")
+    private Boolean archived;
+
+
+    public Book(String authorName, Year releasedAt, String title) {
+        this.authorName = authorName;
+        this.releasedAt = releasedAt;
+        this.title = title;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return Objects.equals(authorName, book.authorName) && Objects.equals(releasedAt, book.releasedAt) && Objects.equals(title, book.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(authorName, releasedAt, title);
+    }
+}

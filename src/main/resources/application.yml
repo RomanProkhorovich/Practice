@@ -1,0 +1,19 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username:  pomaprokhorovich583@gmail.com
+    password: xzxaxjqwxvwcncyg
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true
+
+library:
+  maxDays: 30
