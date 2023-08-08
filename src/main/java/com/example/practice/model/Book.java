@@ -1,5 +1,6 @@
 package com.example.practice.model;
 
+import com.example.practice.exception.FutureBookException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,10 +38,12 @@ public class Book {
     private String title;
 
     @Column(name = "archived")
-    private Boolean archived;
+    private Boolean archived=false;
 
 
-    public Book(String authorName, Year releasedAt, String title) {
+    public Book(@NonNull String authorName, @NonNull Year releasedAt, @NonNull String title) {
+        if (releasedAt.isAfter(Year.now()))
+            throw new FutureBookException();
         this.authorName = authorName;
         this.releasedAt = releasedAt;
         this.title = title;

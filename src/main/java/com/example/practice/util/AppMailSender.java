@@ -17,6 +17,7 @@ public class AppMailSender {
     public void sendMessage(String to,
                             String subject,
                             String text){
+
         SimpleMailMessage message=new SimpleMailMessage();
         message.setSubject(subject);
         message.setText(text);

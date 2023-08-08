@@ -9,6 +9,9 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 public class Reader {
+    {
+        isActive=true;
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)

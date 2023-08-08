@@ -68,7 +68,7 @@ public class ReaderService implements UserDetailsService {
         if (!reader.getPassword().isBlank()){
             updated.setSurname(reader.getSurname());
         }
-        return save(updated);
+        return readerRepository.save(updated);
     }
 
     public void deleteById(Long id){

@@ -17,3 +17,10 @@ spring:
 
 library:
   maxDays: 30
+  fine: 0.03
+  daysBeforeLargerFine: 15
+  largerFineFactor: 2.0
+
+jwt:
+  lifetime : 30m
+  secret: 14u489ue983w99jmvut9843hgiosdiooijuioju2398u78oiuhfuihy88hidsosoososiojf9vm490ishiuvhnt4e89v9woihnio4v899092903ivnjiu4yhv895nnciuoi8rhn

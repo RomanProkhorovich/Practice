@@ -2,6 +2,7 @@ package com.example.practice.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Objects;
 
@@ -12,11 +13,26 @@ public class BookDuty {
     private long days;
     private float penni;
 
-    public BookDuty(Reader reader, Book book, long days, float penni) {
+    @Value("${library.fine}")
+    private  float fine = 0.03F;
+
+    @Value("${library.daysBeforeLargerFine}")
+    private static int daysBeforeLargerFine = 15;
+    @Value("${library.largerFineFactor}")
+    private static float largerFineFactor = 2.0F;
+
+    public BookDuty(Reader reader, Book book, long days) {
         this.reader = reader;
         this.book = book;
         this.days = days;
-        this.penni = penni;
+        this.penni = getPenni(days);
+    }
+
+    private  float getPenni(long days){
+        if (days>= daysBeforeLargerFine)
+            return days*fine*largerFineFactor;
+
+        return days*fine;
     }
 
     @Override
