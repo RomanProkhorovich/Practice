@@ -10,9 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Component
@@ -23,42 +20,42 @@ public class JwtUtils {
     @Value("${jwt.secret}")
     private  String secret;
 
-    public String generate(UserDetails userDetails) {
-        var now =new Date();
-        var exp = new Date(now.getTime() + lifetime.toMillis());
-        String jws = Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .claim("role", userDetails.getAuthorities()
-                        .stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .findFirst()
-                        .orElseThrow())
-                .setIssuedAt(now)
-                .setExpiration(exp)
-                .signWith(
-                        SignatureAlgorithm.HS256,
-                        secret.getBytes()
-                )
+    private byte[] getSecret(){
+        return secret.getBytes();
+    }
+
+    public String generateToken(UserDetails details) {
+
+        String role = details.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).findFirst().orElseThrow();
+
+
+        Date created = new Date();
+        Date expired = new Date(created.getTime() + lifetime.toMillis());
+        return Jwts.builder()
+                .claim("roles",role)
+                .setIssuedAt(created)
+                .setExpiration(expired)
+                .setSubject(details.getUsername())
+                .signWith(SignatureAlgorithm.HS256,secret)
                 .compact();
-        return jws;
+    }
+
+    public String getRoleFromToken(String token){
+        return getClaimsFromToken(token).get("roles",String.class);
     }
 
     public String getUsernameFromToken(String token){
-        return getClaims(token).getSubject();
+        return getClaimsFromToken(token).getSubject();
     }
 
-
-    public String getRoleFromToken(String token){
-        return getClaims(token).get("role", String.class);
-    }
-
-    private Claims getClaims(String token){
-        var body=Jwts.parser()
-                .setSigningKey(secret.getBytes())
+    private Claims getClaimsFromToken(String token){
+        return Jwts.parser()
+                .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
-        return body;
     }
-
-
 }
+
+
+

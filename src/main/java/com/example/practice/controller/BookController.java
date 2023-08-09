@@ -8,6 +8,8 @@ import com.example.practice.model.Role;
 import com.example.practice.service.BookService;
 import com.example.practice.service.LogService;
 import com.example.practice.service.ReaderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,48 +32,135 @@ public class BookController {
         this.logService = logService;
     }
 
+    @Operation(
+            method = "GET",
+            tags = {"BOOK", "USER", "ADMIN"},
+            summary = "Find all books",
+            description = "Find all books. If user is ADMIN returns all existing books. If user is USER returns all his books",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "books"
+                    )
+            })
     @GetMapping
-    public ResponseEntity<List<Book>> findAll( Principal userDetails) {
+    public ResponseEntity<List<Book>> findAll(Principal userDetails) {
         var reader = readerService.findByEmail(userDetails.getName()).orElseThrow(UserNotFoundException::new);
         Role role = reader.getRole();
         if (role.equals(Role.USER)) {
             return getAllUserBooks(reader);
-        }
-        else if (role.equals(Role.ADMIN)){
+        } else if (role.equals(Role.ADMIN)) {
             return getAllBooks();
         }
-        throw  new RuntimeException();
+        throw new RuntimeException();
     }
+
+
+    @Operation(
+            method = "GET",
+            tags = {"BOOK", "ADMIN"},
+            summary = "Find book by id",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "book found successfully"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "book not found"
+                    )
+            })
     @GetMapping("/{id}")
-    public ResponseEntity<Book> findById(@PathVariable long id){
-        var book=bookService.findById(id).orElseThrow(
-                ()-> new BookNotFoundException(String.format("Book with id %d not found", id))
+    public ResponseEntity<Book> findById(@PathVariable long id) {
+        var book = bookService.findById(id).orElseThrow(
+                () -> new BookNotFoundException(String.format("Book with id %d not found", id))
         );
         return ResponseEntity.ok(book);
     }
+
+
+    @Operation(
+            method = "GET",
+            tags = {"BOOK", "ADMIN"},
+            summary = "Find all not archived book",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "books dont archived"
+                    )
+            })
     @GetMapping("/not_archived")
-    public ResponseEntity<List<Book>> findAllNotArchived(){
+    public ResponseEntity<List<Book>> findAllNotArchived() {
         return ResponseEntity.ok(bookService.findAllNotArchived());
     }
 
+
+
+    @Operation(
+            method = "POST",
+            tags = {"BOOK", "ADMIN"},
+            summary = "Create new book",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "book created"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "this book already exist"
+                    )
+            })
     @PostMapping()
-    public ResponseEntity<Book> create(@RequestBody Book book){
+    public ResponseEntity<Book> create(@RequestBody Book book) {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookService.save(book));
     }
 
+
+
+    @Operation(
+            method = "PUT",
+            tags = {"BOOK", "ADMIN"},
+            summary = "Create new book",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "book updated"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "book not found"
+                    )
+            })
     @PutMapping
-    public ResponseEntity<Book> update(@RequestBody Book book){
+    public ResponseEntity<Book> update(@RequestBody Book book) {
         return ResponseEntity.ok(bookService.update(book));
     }
+
+
+
+    @Operation(
+            method = "PUT",
+            tags = {"BOOK", "ADMIN"},
+            summary = "Delete book",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "book archived"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "book not found"
+                    )
+            })
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable long id){
-        return ResponseEntity.ok( bookService.deleteById(id));
+    public ResponseEntity<?> delete(@PathVariable long id) {
+        return ResponseEntity.ok(bookService.deleteById(id));
     }
 
 
     private ResponseEntity<List<Book>> getAllBooks() {
         List<Book> books;
-        books=bookService.findAll();
+        books = bookService.findAll();
         return ResponseEntity.ok(books);
     }
 

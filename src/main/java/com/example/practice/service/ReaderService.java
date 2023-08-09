@@ -71,6 +71,8 @@ public class ReaderService implements UserDetailsService {
         return readerRepository.save(updated);
     }
 
+
+
     public void deleteById(Long id){
         findById(id).orElseThrow(
                 ()-> new UserNotFoundException(String.format("User with id: '%d' not found", id))
