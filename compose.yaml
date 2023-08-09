@@ -1,9 +1,0 @@
-services:
-  postgres:
-    image: 'postgres:15'
-    environment:
-      - 'POSTGRES_DB=practice_db'
-      - 'POSTGRES_PASSWORD=password'
-      - 'POSTGRES_USER=user'
-    ports:
-      - '5432'

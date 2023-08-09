@@ -36,11 +36,13 @@ public class Reader {
     private String surname; //nullable потому что не у всех есть отчество
 
     @Column(name = "active")
+    @Builder.Default
     private Boolean isActive=true;
 
     @NonNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private Role role=Role.USER;
 
 

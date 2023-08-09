@@ -1,8 +1,17 @@
 spring:
+  properties:
+    hibernate:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
   jpa:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:55555/practice_db
+    username: "roma"
+    password: "123"
+
 
 
   mail:
@@ -15,6 +24,10 @@ spring:
         smtp:
           auth: true
           starttls.enable: true
+
+
+
+
 
 library:
   maxDays: 30

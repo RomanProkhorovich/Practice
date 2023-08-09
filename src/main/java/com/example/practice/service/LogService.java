@@ -52,7 +52,7 @@ public class LogService {
     }
 
 
-    //TODO: расчитать пенни
+
     public List<BookDuty> getAllReaderDuty(Reader reader) {
         var notReturned = repository.findAllByReader(reader).stream()
                 .filter(LogService::checkIsDuty).collect(Collectors.toSet());
