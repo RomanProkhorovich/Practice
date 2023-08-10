@@ -1,5 +1,7 @@
 package com.example.practice.service;
 
+import com.example.practice.exception.BookNotFoundException;
+import com.example.practice.exception.DeletedUserException;
 import com.example.practice.model.*;
 import com.example.practice.repository.LogRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,14 +20,29 @@ import static java.time.temporal.ChronoUnit.DAYS;
 @Service
 public class LogService {
     private final LogRepository repository;
+    private final BookService bookService;
+    private final ReaderService readerService;
     @Value("${library.maxDays}")
     private static int MAX_DAYS;
 
-    public LogService(LogRepository repository) {
+    public LogService(LogRepository repository, BookService bookService, ReaderService readerService) {
         this.repository = repository;
+        this.bookService = bookService;
+        this.readerService = readerService;
     }
 
     public Log save(Log log) {
+        var readerId=log.getReader().getId();
+        var reader = readerService.findById(readerId).orElseThrow();
+        if (!reader.getIsActive()){
+            throw new DeletedUserException( String.format("Reader with id %d is deleted", readerId));
+        }
+
+        Long bookId = log.getBook().getId();
+        var book = bookService.findById(bookId).orElseThrow();
+        if (book.getArchived()){
+            throw new BookNotFoundException( String.format("Book with id %d is archived", bookId));
+        }
         return repository.save(log);
     }
 

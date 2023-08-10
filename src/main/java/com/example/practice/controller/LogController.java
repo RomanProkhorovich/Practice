@@ -6,6 +6,7 @@ import com.example.practice.exception.BookNotFoundException;
 import com.example.practice.exception.DeletedUserException;
 import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.model.BookDuty;
+import com.example.practice.model.BookReaderId;
 import com.example.practice.model.Log;
 import com.example.practice.model.Reader;
 import com.example.practice.service.BookService;
@@ -134,17 +135,9 @@ public class LogController {
     )
     @PostMapping
     public ResponseEntity<Log> issueBook(@RequestBody BookReaderIdDto dto) {
-        var reader = readerService.findById(dto.getReaderId()).orElseThrow();
-        if (!reader.getIsActive()){
-            throw new DeletedUserException( String.format("Reader with id %d is deleted", dto.getReaderId()));
-        }
 
-        var book = bookService.findById(dto.getBookId()).orElseThrow();
-        if (!book.getArchived()){
-            throw new BookNotFoundException( String.format("Book with id %d is archived", dto.getBookId()));
-        }
 
-        return ResponseEntity.ok(logService.save(new Log(book, reader, LocalDate.now())));
+        return ResponseEntity.ok(logService.save(new Log(new BookReaderId(dto.getBookId(),dto.getReaderId()))));
     }
 
 }

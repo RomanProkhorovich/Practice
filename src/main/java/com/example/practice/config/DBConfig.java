@@ -56,7 +56,7 @@ public class DBConfig {
         // Log log= logService.save(new Log(it,reader2, LocalDate.now()));
 
 
-        Log log2= logService.save(new Log(it, reader2, LocalDate.now()));
+        Log log2= logService.save(new Log(it, reader2));
 
        /* Log log1= logService.save(new Log(winnie,reader2, LocalDate.now()));
 

@@ -27,17 +27,17 @@ public class Log {
     private LocalDate issueDate;
     private LocalDate returnedDate;
 
-    public Log(BookReaderId id, LocalDate issueDate) {
+    public Log(BookReaderId id) {
         this.id = id;
-        this.issueDate = issueDate;
+        this.issueDate = LocalDate.now();
     }
 
-    public Log(Book book, Reader reader, LocalDate issueDate) {
+    public Log(Book book, Reader reader) {
         this.id.setBookId(book.getId());
         this.id.setReaderId(reader.getId());
         this.book = book;
         this.reader = reader;
-        this.issueDate = issueDate;
+        this.issueDate = LocalDate.now();
     }
 
     public Log() {
