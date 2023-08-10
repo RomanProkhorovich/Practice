@@ -48,9 +48,9 @@ public class BookController {
         var reader = readerService.findByEmail(userDetails.getName()).orElseThrow(UserNotFoundException::new);
         Role role = reader.getRole();
         if (role.equals(Role.USER)) {
-            return getAllUserBooks(reader);
+            return ResponseEntity.ok(logService.findAllBooksByReader(reader));
         } else if (role.equals(Role.ADMIN)) {
-            return getAllBooks();
+            return ResponseEntity.ok(bookService.findAll());
         }
         throw new RuntimeException();
     }
@@ -155,19 +155,6 @@ public class BookController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable long id) {
         return ResponseEntity.ok(bookService.deleteById(id));
-    }
-
-
-    private ResponseEntity<List<Book>> getAllBooks() {
-        List<Book> books;
-        books = bookService.findAll();
-        return ResponseEntity.ok(books);
-    }
-
-    private ResponseEntity<List<Book>> getAllUserBooks(Reader reader) {
-        List<Book> books;
-        books = logService.findAllBooksByReader(reader);
-        return ResponseEntity.ok(books);
     }
 
 

@@ -9,6 +9,7 @@ import java.util.Date;
 
 @Entity
 @Getter
+@Setter
 public class Log {
 
     @EmbeddedId
@@ -44,43 +45,4 @@ public class Log {
 
     }
 
-    public BookReaderId getId() {
-        return id;
-    }
-
-    public void setId(BookReaderId id) {
-        this.id = id;
-    }
-
-    public Book getBook() {
-        return book;
-    }
-
-    public void setBook(Book book) {
-        this.book = book;
-    }
-
-    public Reader getReader() {
-        return reader;
-    }
-
-    public void setReader(Reader reader) {
-        this.reader = reader;
-    }
-
-    public LocalDate getIssueDate() {
-        return issueDate;
-    }
-
-    public void setIssueDate(LocalDate issueDate) {
-        this.issueDate = issueDate;
-    }
-
-    public LocalDate getReturnedDate() {
-        return returnedDate;
-    }
-
-    public void setReturnedDate(LocalDate returnedDate) {
-        this.returnedDate = returnedDate;
-    }
 }

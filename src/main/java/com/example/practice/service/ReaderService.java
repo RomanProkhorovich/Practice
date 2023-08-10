@@ -1,5 +1,7 @@
 package com.example.practice.service;
 
+import com.example.practice.Dto.AuthDto;
+import com.example.practice.Dto.RegDto;
 import com.example.practice.exception.DeletedUserException;
 import com.example.practice.exception.UserAlreadyExistException;
 import com.example.practice.exception.UserNotFoundException;
@@ -10,6 +12,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -72,6 +75,17 @@ public class ReaderService implements UserDetailsService {
     }
 
 
+    public Reader save(RegDto regDto, PasswordEncoder passwordEncoder){
+        var password = regDto.getPassword();
+        Reader reader = Reader.builder()
+                .email(regDto.getEmail())
+                .firstname(regDto.getFirstname())
+                .lastname(regDto.getLastname())
+                .surname(regDto.getSurname())
+                .password(passwordEncoder.encode(password))
+                .build();
+        return save(reader);
+    }
 
     public void deleteById(Long id){
         findById(id).orElseThrow(

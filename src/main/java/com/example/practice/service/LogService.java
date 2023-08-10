@@ -82,7 +82,7 @@ public class LogService {
 
     public List<Log> getAllByMonth(Integer year, Month month){
         var start=LocalDate.of(year, month,1);
-        var end=LocalDate.of(year, month,31);
+        var end=LocalDate.of(year, month, start.lengthOfMonth());
         return repository.findAllByIssueDateBetween(start,end);
     }
 
