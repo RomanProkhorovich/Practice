@@ -2,7 +2,6 @@ package com.example.practice.service;
 
 import com.example.practice.exception.BookAlreadyExist;
 import com.example.practice.exception.BookNotFoundException;
-import com.example.practice.exception.FutureBookException;
 import com.example.practice.model.Book;
 import com.example.practice.repository.BookRepository;
 import org.springframework.stereotype.Service;
@@ -31,8 +30,7 @@ public class BookService {
                             book.getReleasedAt(),
                             book.getTitle()));
         }
-        if (book.getReleasedAt().isAfter(Year.of(new Date().getYear())))
-            throw new FutureBookException();
+
         return bookRepository.save(book);
     }
     public Optional<Book> findById(Long id) {
@@ -54,7 +52,7 @@ public class BookService {
 
         if (!book.getAuthorName().isBlank())
             updated.setAuthorName(book.getAuthorName());
-        if (book.getReleasedAt().isBefore(Year.of(new Date().getYear())))
+        if (book.getReleasedAt().isBefore(Year.now()))
             updated.setReleasedAt(book.getReleasedAt());
         if (!book.getTitle().isBlank())
             updated.setTitle(book.getTitle());
@@ -62,8 +60,10 @@ public class BookService {
         return save(updated);
     }
 
-    public void deleteById(Long id){
-        findById(id).orElseThrow(()-> new BookNotFoundException(String.format("Book with id: '%d' not found", id))).setArchived(true);
+    public Book deleteById(Long id){
+        Book book = findById(id).orElseThrow(() -> new BookNotFoundException(String.format("Book with id: '%d' not found", id)));
+        book.setArchived(true);
+        return book;
     }
 
     private Optional<Book> findByAuthorNameAndReleasedAtAndTitle(String author, Year releaseAt, String title){

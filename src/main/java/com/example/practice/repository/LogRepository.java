@@ -13,7 +13,8 @@ import java.util.List;
 @Repository
 public interface LogRepository extends JpaRepository<Log, BookReaderId> {
 
-    List<Log> findAllByIssueDateBefore(LocalDate deadline);
+    List<Log> findAllByIssueDateBeforeAndReturnedDate(LocalDate issueDateMax,LocalDate endDate);
     List<Log> findAllByReader(Reader reader);
+    List<Log> findAllByIssueDateBetween(LocalDate start, LocalDate end);
 
 }

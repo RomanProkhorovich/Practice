@@ -9,6 +9,9 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 public class Reader {
+    {
+        isActive=true;
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
@@ -33,12 +36,14 @@ public class Reader {
     private String surname; //nullable потому что не у всех есть отчество
 
     @Column(name = "active")
-    private Boolean isActive;
+    @Builder.Default
+    private Boolean isActive=true;
 
     @NonNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @Builder.Default
+    private Role role=Role.USER;
 
 
 }

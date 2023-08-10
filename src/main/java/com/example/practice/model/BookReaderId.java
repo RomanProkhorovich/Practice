@@ -18,11 +18,19 @@ public class BookReaderId implements Serializable {
     private Long bookId;
 
     @Column(name = "reader_id")
-    Long readerId;
+    private Long readerId;
 
 
     public BookReaderId(Long bookId, Long readerId) {
         this.bookId = bookId;
+        this.readerId = readerId;
+    }
+
+    public void setBookId(Long bookId) {
+        this.bookId = bookId;
+    }
+
+    public void setReaderId(Long readerId) {
         this.readerId = readerId;
     }
 

@@ -9,11 +9,10 @@ import java.util.Date;
 
 @Entity
 @Getter
-@Setter
 public class Log {
 
     @EmbeddedId
-    private BookReaderId id;
+    private BookReaderId id=new BookReaderId();
 
     @ManyToOne
     @MapsId("bookId")
@@ -28,9 +27,60 @@ public class Log {
     private LocalDate issueDate;
     private LocalDate returnedDate;
 
-    public Log(Book book, Reader reader, LocalDate issueDate) {
+    public Log(BookReaderId id) {
+        this.id = id;
+        this.issueDate = LocalDate.now();
+    }
+
+    public Log(Book book, Reader reader) {
+        this.id.setBookId(book.getId());
+        this.id.setReaderId(reader.getId());
         this.book = book;
         this.reader = reader;
+        this.issueDate = LocalDate.now();
+    }
+
+    public Log() {
+
+    }
+
+    public BookReaderId getId() {
+        return id;
+    }
+
+    public void setId(BookReaderId id) {
+        this.id = id;
+    }
+
+    public Book getBook() {
+        return book;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
+    }
+
+    public Reader getReader() {
+        return reader;
+    }
+
+    public void setReader(Reader reader) {
+        this.reader = reader;
+    }
+
+    public LocalDate getIssueDate() {
+        return issueDate;
+    }
+
+    public void setIssueDate(LocalDate issueDate) {
         this.issueDate = issueDate;
+    }
+
+    public LocalDate getReturnedDate() {
+        return returnedDate;
+    }
+
+    public void setReturnedDate(LocalDate returnedDate) {
+        this.returnedDate = returnedDate;
     }
 }
