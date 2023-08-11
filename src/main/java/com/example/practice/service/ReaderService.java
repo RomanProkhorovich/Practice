@@ -30,6 +30,7 @@ public class ReaderService implements UserDetailsService {
 
 
     public Reader save(Reader reader) {
+
         if (findByEmail(reader.getEmail()).isPresent()) {
             throw new UserAlreadyExistException(
                     String.format("User with email: '%s' already exist", reader.getEmail()));

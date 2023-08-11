@@ -41,10 +41,7 @@ public class BookService {
     }
 
     public List<Book> findAllNotArchived(){
-        return bookRepository.findAll().
-                stream()
-                .filter(x-> !x.getArchived())
-                .collect(Collectors.toList());
+        return bookRepository.findAllByArchived(false);
     }
     public Book update(Book book){
         var updated =findById(book.getId())

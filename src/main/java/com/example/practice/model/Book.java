@@ -2,10 +2,7 @@ package com.example.practice.model;
 
 import com.example.practice.exception.FutureBookException;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Year;
 import java.util.Objects;
@@ -15,6 +12,7 @@ import java.util.Objects;
 @Setter
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"author_name", "released_at", "title"}))
 @NoArgsConstructor
+@AllArgsConstructor
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

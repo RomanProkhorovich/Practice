@@ -71,7 +71,7 @@ public class BookController {
                     )
             })
     @GetMapping("/{id}")
-    public ResponseEntity<Book> findById(@PathVariable long id) {
+    public ResponseEntity<Book> findById(@PathVariable Long id) {
         var book = bookService.findById(id).orElseThrow(
                 () -> new BookNotFoundException(String.format("Book with id %d not found", id))
         );
@@ -153,7 +153,7 @@ public class BookController {
                     )
             })
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         return ResponseEntity.ok(bookService.deleteById(id));
     }
 

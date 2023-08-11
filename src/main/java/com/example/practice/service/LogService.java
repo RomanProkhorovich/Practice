@@ -2,6 +2,7 @@ package com.example.practice.service;
 
 import com.example.practice.exception.BookNotFoundException;
 import com.example.practice.exception.DeletedUserException;
+import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.model.*;
 import com.example.practice.repository.LogRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +34,9 @@ public class LogService {
 
     public Log save(Log log) {
         var readerId=log.getReader().getId();
-        var reader = readerService.findById(readerId).orElseThrow();
+        var reader = readerService.findById(readerId).orElseThrow(()->new UserNotFoundException());
+
+
         if (!reader.getIsActive()){
             throw new DeletedUserException( String.format("Reader with id %d is deleted", readerId));
         }
@@ -53,6 +56,7 @@ public class LogService {
 
     public List<Book> findAllBooksByReader(Reader reader) {
         return repository.findAllByReader(reader).stream()
+                .filter(x->x.getReturnedDate()==null)
                 .map(Log::getBook)
                 .collect(Collectors.toList());
     }
