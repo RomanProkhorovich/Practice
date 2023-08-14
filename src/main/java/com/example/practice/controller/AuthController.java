@@ -51,9 +51,7 @@ public class AuthController {
     )
     @PostMapping
     public ResponseEntity<Token> generateToken(@RequestBody AuthDto dto) {
-
-        authUtil.auth(dto.getUsername(),dto.getPassword());
-        return ResponseEntity.ok(new Token(jwtUtils.generateToken(dto.getUsername())));
+        return ResponseEntity.ok(new Token( authUtil.auth(dto.getUsername(),dto.getPassword())));
     }
 
 
@@ -76,7 +74,6 @@ public class AuthController {
     @PostMapping("/registration")
     public ResponseEntity<AuthDto> doRegistration(@RequestBody RegDto regDto) {
 
-        readerService.save(regDto,passwordEncoder);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new AuthDto(regDto.getEmail(), regDto.getPassword()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(readerService.saveAndMap(regDto,passwordEncoder));
     }
 }

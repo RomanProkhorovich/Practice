@@ -45,14 +45,7 @@ public class BookController {
             })
     @GetMapping
     public ResponseEntity<List<Book>> findAll(Principal userDetails) {
-        var reader = readerService.findByEmail(userDetails.getName()).orElseThrow(UserNotFoundException::new);
-        Role role = reader.getRole();
-        if (role.equals(Role.USER)) {
-            return ResponseEntity.ok(logService.findAllBooksByReader(reader));
-        } else if (role.equals(Role.ADMIN)) {
-            return ResponseEntity.ok(bookService.findAll());
-        }
-        throw new RuntimeException();
+        return ResponseEntity.ok(logService.findAllBooksByReader(userDetails.getName()));
     }
 
 
@@ -95,7 +88,6 @@ public class BookController {
     }
 
 
-
     @Operation(
             method = "POST",
             tags = {"BOOK", "ADMIN"},
@@ -116,7 +108,6 @@ public class BookController {
     }
 
 
-
     @Operation(
             method = "PUT",
             tags = {"BOOK", "ADMIN"},
@@ -135,7 +126,6 @@ public class BookController {
     public ResponseEntity<Book> update(@RequestBody Book book) {
         return ResponseEntity.ok(bookService.update(book));
     }
-
 
 
     @Operation(

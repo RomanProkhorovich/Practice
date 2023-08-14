@@ -15,11 +15,9 @@ import java.time.Month;
 @RestController
 @RequestMapping("/api/excel")
 public class ExcelController {
-    private final ExcelFileWriter fileWriter;
     private final LogService logService;
 
-    public ExcelController(ExcelFileWriter fileWriter, LogService logService) {
-        this.fileWriter = fileWriter;
+    public ExcelController( LogService logService) {
         this.logService = logService;
     }
 

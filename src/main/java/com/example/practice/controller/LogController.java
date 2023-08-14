@@ -27,7 +27,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LogController {
     private final LogService logService;
-    private final BookService bookService;
     private final ReaderService readerService;
     private final AppMailSender mailSender;
 

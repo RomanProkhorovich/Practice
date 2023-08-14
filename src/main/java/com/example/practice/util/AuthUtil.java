@@ -10,18 +10,23 @@ import org.springframework.stereotype.Service;
 public class AuthUtil {
 
     private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
 
-    public AuthUtil(AuthenticationManager authenticationManager) {
+    public AuthUtil(AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
         this.authenticationManager = authenticationManager;
+        this.jwtUtils = jwtUtils;
     }
 
-    public void auth(String username,String password){
+    public String auth(String username,String password){
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username,password)
             );
+
         } catch (BadCredentialsException e) {
             throw new UserNotFoundException(String.format("User with email %s not found",password));
         }
+
+        return jwtUtils.generateToken(username);
     }
 }

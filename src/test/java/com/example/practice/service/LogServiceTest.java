@@ -216,7 +216,9 @@ class LogServiceTest {
         var end=LocalDate.of(-999999999, 1, start.lengthOfMonth());
         Mockito.when(repository.findAllByIssueDateBetween(start,end)).thenReturn(List.of(log,log2,log3,log4));
 
-        assertEquals(4,logService.getAllByMonth(-999999999, Month.of(1)).size());
+        List<Log> allByMonth = logService.getAllByMonth(-999999999, Month.of(1));
+        int size = allByMonth.size();
+        assertEquals(4, size);
     }
 
     @Test

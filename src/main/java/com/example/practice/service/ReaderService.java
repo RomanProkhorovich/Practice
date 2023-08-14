@@ -1,5 +1,6 @@
 package com.example.practice.service;
 
+
 import com.example.practice.Dto.AuthDto;
 import com.example.practice.Dto.RegDto;
 import com.example.practice.exception.DeletedUserException;
@@ -37,6 +38,7 @@ public class ReaderService implements UserDetailsService {
         }
         return readerRepository.save(reader);
     }
+
     public Optional<Reader> findByEmail(String email) {
         return readerRepository.findByEmail(email);
     }
@@ -86,6 +88,10 @@ public class ReaderService implements UserDetailsService {
                 .password(passwordEncoder.encode(password))
                 .build();
         return save(reader);
+    }
+    public AuthDto saveAndMap(RegDto regDto, PasswordEncoder passwordEncoder){
+        Reader saved = save(regDto, passwordEncoder);
+        return new AuthDto(saved.getEmail(),saved.getPassword());
     }
 
     public void deleteById(Long id){

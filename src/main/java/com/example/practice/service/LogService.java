@@ -6,6 +6,7 @@ import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.model.*;
 import com.example.practice.repository.LogRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
@@ -33,18 +34,18 @@ public class LogService {
     }
 
     public Log save(Log log) {
-        var readerId=log.getReader().getId();
-        var reader = readerService.findById(readerId).orElseThrow(()->new UserNotFoundException());
+        var readerId = log.getReader().getId();
+        var reader = readerService.findById(readerId).orElseThrow(() -> new UserNotFoundException());
 
 
-        if (!reader.getIsActive()){
-            throw new DeletedUserException( String.format("Reader with id %d is deleted", readerId));
+        if (!reader.getIsActive()) {
+            throw new DeletedUserException(String.format("Reader with id %d is deleted", readerId));
         }
 
         Long bookId = log.getBook().getId();
         var book = bookService.findById(bookId).orElseThrow();
-        if (book.getArchived()){
-            throw new BookNotFoundException( String.format("Book with id %d is archived", bookId));
+        if (book.getArchived()) {
+            throw new BookNotFoundException(String.format("Book with id %d is archived", bookId));
         }
         return repository.save(log);
     }
@@ -54,23 +55,33 @@ public class LogService {
         return repository.findById(id);
     }
 
+
     public List<Book> findAllBooksByReader(Reader reader) {
-        return repository.findAllByReader(reader).stream()
-                .filter(x->x.getReturnedDate()==null)
-                .map(Log::getBook)
-                .collect(Collectors.toList());
+        if (reader.getRole().equals(Role.USER))
+            return repository.findAllByReader(reader).stream()
+                    .filter(x -> x.getReturnedDate() == null)
+                    .map(Log::getBook)
+                    .collect(Collectors.toList());
+        else if (reader.getRole().equals(Role.ADMIN)) {
+            return bookService.findAll();
+        }
+        throw new UsernameNotFoundException("Username not found");
+    }
+    public List<Book> findAllBooksByReader(String email) {
+        var reader = readerService.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        return findAllBooksByReader(reader);
     }
 
     public Log returnBook(Reader reader, Book book) {
-        return returnBookById(new BookReaderId(book.getId(),reader.getId()));
+        return returnBookById(new BookReaderId(book.getId(), reader.getId()));
 
     }
+
     public Log returnBookById(BookReaderId id) {
         var log = findById(id).orElseThrow();
         log.setReturnedDate(LocalDate.now());
         return save(log);
     }
-
 
 
     public List<BookDuty> getAllReaderDuty(Reader reader) {
@@ -84,10 +95,10 @@ public class LogService {
                 .collect(Collectors.toList());
     }
 
-    public List<Log> getAllByMonth(Integer year, Month month){
-        var start=LocalDate.of(year, month,1);
-        var end=LocalDate.of(year, month, start.lengthOfMonth());
-        return repository.findAllByIssueDateBetween(start,end);
+    public List<Log> getAllByMonth(Integer year, Month month) {
+        var start = LocalDate.of(year, month, 1);
+        var end = LocalDate.of(year, month, start.lengthOfMonth());
+        return repository.findAllByIssueDateBetween(start, end);
     }
 
     public List<BookDuty> getAllDuty() {
@@ -102,8 +113,8 @@ public class LogService {
         return Math.abs(Duration.ofDays(DAYS.between(LocalDate.now(), issue)).toDays());
     }
 
-    public static boolean checkIsDuty(Log log){
-        return  (log.getIssueDate().isBefore(LocalDate.now().minusDays(MAX_DAYS)) &&
+    public static boolean checkIsDuty(Log log) {
+        return (log.getIssueDate().isBefore(LocalDate.now().minusDays(MAX_DAYS)) &&
                 log.getReturnedDate() == null);
     }
 }
