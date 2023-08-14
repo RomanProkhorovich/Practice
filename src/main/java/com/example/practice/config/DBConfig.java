@@ -15,7 +15,7 @@ import java.time.Year;
 @Configuration
 @RequiredArgsConstructor
 public class DBConfig {
-    private final BCryptPasswordEncoder passwordEncoder;
+   /* private final BCryptPasswordEncoder passwordEncoder;
 
     private final BookService bookService;
 
@@ -56,11 +56,11 @@ public class DBConfig {
         // Log log= logService.save(new Log(it,reader2, LocalDate.now()));
 
 
-        Log log2= logService.save(new Log(it, reader2));
+        Log log2= logService.save(new Log(it, reader2));*/
 
        /* Log log1= logService.save(new Log(winnie,reader2, LocalDate.now()));
 
         Log log2= logService.save(new Log(lordOfTheRing,reader2, LocalDate.now()));*/
 
-    }
+   /* }*/
 }

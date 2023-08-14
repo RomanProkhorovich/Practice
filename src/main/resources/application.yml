@@ -4,16 +4,13 @@ spring:
       dialect: org.hibernate.dialect.PostgreSQLDialect
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     show-sql: true
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:55555/practice_db
     username: "roma"
     password: "123"
-
-
-
   mail:
     host: smtp.gmail.com
     port: 587
@@ -24,8 +21,8 @@ spring:
         smtp:
           auth: true
           starttls.enable: true
-
-
+  liquibase:
+    enabled: true
 
 
 
