@@ -1,15 +1,11 @@
 package com.example.practice.controller;
 
 
-import com.example.practice.Dto.BookReaderIdDto;
-import com.example.practice.exception.BookNotFoundException;
-import com.example.practice.exception.DeletedUserException;
+import com.example.practice.Dto.BookReaderKeys;
 import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.model.BookDuty;
-import com.example.practice.model.BookReaderId;
 import com.example.practice.model.Log;
 import com.example.practice.model.Reader;
-import com.example.practice.service.BookService;
 import com.example.practice.service.LogService;
 import com.example.practice.service.ReaderService;
 import com.example.practice.util.AppMailSender;
@@ -19,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -110,9 +105,8 @@ public class LogController {
             }
     )
     @DeleteMapping
-    public ResponseEntity<Log> returnBook(@RequestBody BookReaderIdDto dto) {
-        var logId = BookReaderIdDto.map(dto);
-        var log = logService.returnBookById(logId);
+    public ResponseEntity<Log> returnBook(@RequestBody long id) {
+        var log = logService.returnBookById(id);
         return ResponseEntity.ok(log);
     }
 
@@ -133,10 +127,8 @@ public class LogController {
             }
     )
     @PostMapping
-    public ResponseEntity<Log> issueBook(@RequestBody BookReaderIdDto dto) {
-
-
-        return ResponseEntity.ok(logService.save(new Log(new BookReaderId(dto.getBookId(),dto.getReaderId()))));
+    public ResponseEntity<Log> issueBook(@RequestBody BookReaderKeys dto) {
+        return ResponseEntity.ok(logService.issueBook(dto));
     }
 
 }

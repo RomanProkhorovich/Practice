@@ -1,5 +1,6 @@
 package com.example.practice.service;
 
+import com.example.practice.Dto.BookReaderKeys;
 import com.example.practice.exception.BookNotFoundException;
 import com.example.practice.exception.DeletedUserException;
 import com.example.practice.exception.UserNotFoundException;
@@ -34,24 +35,21 @@ public class LogService {
     }
 
     public Log save(Log log) {
-        var readerId = log.getReader().getId();
-        var reader = readerService.findById(readerId).orElseThrow(() -> new UserNotFoundException());
-
+        var reader = log.getReader();
 
         if (!reader.getIsActive()) {
-            throw new DeletedUserException(String.format("Reader with id %d is deleted", readerId));
+            throw new DeletedUserException(String.format("Reader with id %d is deleted", reader.getId()));
         }
 
-        Long bookId = log.getBook().getId();
-        var book = bookService.findById(bookId).orElseThrow();
+        var book = log.getBook();
         if (book.getArchived()) {
-            throw new BookNotFoundException(String.format("Book with id %d is archived", bookId));
+            throw new BookNotFoundException(String.format("Book with id %d is archived", book.getId()));
         }
         return repository.save(log);
     }
 
 
-    public Optional<Log> findById(BookReaderId id) {
+    public Optional<Log> findById(Long id) {
         return repository.findById(id);
     }
 
@@ -72,15 +70,18 @@ public class LogService {
         return findAllBooksByReader(reader);
     }
 
-    public Log returnBook(Reader reader, Book book) {
-        return returnBookById(new BookReaderId(book.getId(), reader.getId()));
 
-    }
 
-    public Log returnBookById(BookReaderId id) {
+    public Log returnBookById(Long id) {
         var log = findById(id).orElseThrow();
         log.setReturnedDate(LocalDate.now());
         return save(log);
+    }
+
+    public Log issueBook(BookReaderKeys keys){
+        var book=bookService.findById(keys.bookId).orElseThrow(()->new BookNotFoundException());
+        var reader=readerService.findById(keys.readerId).orElseThrow(()->new UserNotFoundException());
+        return save(new Log(book,reader));
     }
 
 

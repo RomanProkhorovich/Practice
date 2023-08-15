@@ -9,3 +9,4 @@ alter table if exists log
 
 create sequence book_seq start with 1 increment by 50 ;
 create sequence reader_seq start with 1 increment by 50;
+create sequence log_seq start with 1 increment by 50;
