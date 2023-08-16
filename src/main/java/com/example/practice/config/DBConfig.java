@@ -21,7 +21,7 @@ public class DBConfig {
 
     private final ReaderService readerService;
     private final LogService logService;
-    @Bean
+  /*  @Bean
     public void init(){
         Book it= new Book("Stephen King", Year.of(1986), "IT");
         Book prideAndPrejudice= new Book("Jane Austen", Year.of(1813), "Pride and Prejudice");
@@ -56,5 +56,5 @@ public class DBConfig {
         // Log log= logService.save(new Log(it,reader2, LocalDate.now()));
 
 
-    }
+    }*/
 }

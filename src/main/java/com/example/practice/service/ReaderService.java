@@ -6,6 +6,7 @@ import com.example.practice.Dto.RegDto;
 import com.example.practice.exception.DeletedUserException;
 import com.example.practice.exception.UserAlreadyExistException;
 import com.example.practice.exception.UserNotFoundException;
+import com.example.practice.mapper.ReaderMapper;
 import com.example.practice.model.Reader;
 import com.example.practice.repository.ReaderRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,8 +26,10 @@ public class ReaderService implements UserDetailsService {
 
     private final ReaderRepository readerRepository;
 
-    public ReaderService(ReaderRepository readerRepository) {
+    private final ReaderMapper readerMapper;
+    public ReaderService(ReaderRepository readerRepository, ReaderMapper readerMapper) {
         this.readerRepository = readerRepository;
+        this.readerMapper = readerMapper;
     }
 
 

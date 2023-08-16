@@ -57,9 +57,9 @@ class LogServiceTest {
 
         Log log2= (new Log(it, reader2));
         Mockito.when(repository.save(log2)).thenReturn(log2);
-        Mockito.when(readerService.findById(1L)).thenReturn(Optional.of(reader2));
+      /*  Mockito.when(readerService.findById(1L)).thenReturn(Optional.of(reader2));
         Mockito.when(bookService.findById(1L)).thenReturn(Optional.of(it));
-
+*/
         assertEquals(log2,logService.save(log2));
     }
 
@@ -135,9 +135,9 @@ class LogServiceTest {
 
         Log log= new Log(prideAndPrejudice, reader2);
         Mockito.when(repository.findById(1L)).thenReturn(Optional.of(log));
-        Mockito.when(readerService.findById(1L)).thenReturn(Optional.of(reader2));
+      /*  Mockito.when(readerService.findById(1L)).thenReturn(Optional.of(reader2));
         Mockito.when(bookService.findById(1L)).thenReturn(Optional.of(prideAndPrejudice));
-        logService.returnBookById(1L);
+       */ logService.returnBookById(1L);
         assertNotEquals(null,logService.findById(1L).get().getReturnedDate());
     }
 

@@ -30,7 +30,6 @@ class BookServiceTest {
     void saveExpectSave() {
         Book it= new Book("Stephen King", Year.of(1986), "IT");
 
-
         //Mockito.when(bookRepository.findByAuthorNameAndReleasedAtAndTitle("Stephen King", Year.of(1986), "IT")).thenReturn(Optional.of(it));
         Mockito.when(bookRepository.save(it)).thenReturn(it);
         assertEquals(it,bookService.save(it));
