@@ -21,13 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    private final JwtUtils jwtUtils;
     private final ReaderService readerService;
     private final AuthUtil authUtil;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public AuthController(JwtUtils jwtUtils, ReaderService readerService, AuthUtil authUtil, BCryptPasswordEncoder passwordEncoder) {
-        this.jwtUtils = jwtUtils;
+    public AuthController(ReaderService readerService, AuthUtil authUtil, BCryptPasswordEncoder passwordEncoder) {
         this.readerService = readerService;
         this.authUtil = authUtil;
         this.passwordEncoder = passwordEncoder;

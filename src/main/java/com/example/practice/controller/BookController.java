@@ -23,12 +23,10 @@ import java.util.List;
 @RequestMapping("/api/books")
 public class BookController {
     private final BookService bookService;
-    private final ReaderService readerService;
     private final LogService logService;
 
-    public BookController(BookService bookService, ReaderService readerService, LogService logService) {
+    public BookController(BookService bookService, LogService logService) {
         this.bookService = bookService;
-        this.readerService = readerService;
         this.logService = logService;
     }
 
