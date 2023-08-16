@@ -32,18 +32,18 @@ public class ExcelFileWriter {
         row.createCell(1).setCellValue(issuedAndNotReturnedBooks.size());
 
         var duties = issuedAndNotReturnedBooks.stream().filter(LogService::checkIsDuty).collect(Collectors.toSet());
+        var readers=duties.stream().map(Log::getReader).collect(Collectors.toSet());
         Row row1= sheet.createRow(1);
         row1.createCell(0).setCellValue("Количство должников:");
-        row1.createCell(1).setCellValue(duties.size());
+        row1.createCell(1).setCellValue(readers.size());
         sheet.createRow(2).createCell(0).setCellValue("Должники:");
 
         int rowCount=3;
-        for (var item:duties){
-            var reader=item.getReader();
+        for (var item:readers){
             var dutyRow=sheet.createRow(rowCount);
-            dutyRow.createCell(0).setCellValue(reader.getLastname());
-            dutyRow.createCell(1).setCellValue(reader.getFirstname());
-            dutyRow.createCell(2).setCellValue(reader.getSurname());
+            dutyRow.createCell(0).setCellValue(item.getLastname());
+            dutyRow.createCell(1).setCellValue(item.getFirstname());
+            dutyRow.createCell(2).setCellValue(item.getSurname());
 
             rowCount++;
         }

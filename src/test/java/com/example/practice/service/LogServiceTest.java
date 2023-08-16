@@ -304,6 +304,6 @@ class LogServiceTest {
         logService.generateLog();
 
         assertEquals(4,ExcelFileWriter.getNumericCellValue(0,1,"files/отчет по таймеру.xlsx"));
-        assertEquals(4,ExcelFileWriter.getNumericCellValue(1,1,"files/отчет по таймеру.xlsx"));
+        assertEquals(1,ExcelFileWriter.getNumericCellValue(1,1,"files/отчет по таймеру.xlsx"));
     }
 }
