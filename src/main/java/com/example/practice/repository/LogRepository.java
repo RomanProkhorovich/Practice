@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface LogRepository extends JpaRepository<Log, Long> {
@@ -14,5 +15,7 @@ public interface LogRepository extends JpaRepository<Log, Long> {
     List<Log> findAllByIssueDateBeforeAndReturnedDate(LocalDate issueDateMax,LocalDate endDate);
     List<Log> findAllByReader(Reader reader);
     List<Log> findAllByIssueDateBetween(LocalDate start, LocalDate end);
+
+    Set<Log> findAllByReturnedDate(LocalDate date);
 
 }

@@ -6,11 +6,15 @@ import com.example.practice.exception.DeletedUserException;
 import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.model.*;
 import com.example.practice.repository.LogRepository;
+import com.example.practice.util.ExcelFileWriter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
@@ -108,6 +112,13 @@ public class LogService {
                 .map(x -> new BookDuty(x.getReader(), x.getBook(),
                         getDurationBetweenNowAndIssueDate(x.getIssueDate())))
                 .collect(Collectors.toList());
+    }
+
+    @Scheduled(fixedRate = 12*60*60*1000)
+    @Async
+    public void generateLog() throws IOException {
+        ExcelFileWriter.generateSchedulerFile(repository.findAllByReturnedDate(null));
+
     }
 
     private static long getDurationBetweenNowAndIssueDate(LocalDate issue) {
