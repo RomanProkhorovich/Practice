@@ -3,12 +3,14 @@ package com.example.practice.util;
 import com.example.practice.model.BookDuty;
 import com.example.practice.model.Log;
 import com.example.practice.service.LogService;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -53,6 +55,15 @@ public class ExcelFileWriter {
         FileOutputStream fos = new FileOutputStream("files/" + filename +".xlsx");
         workbook.write(fos);
         fos.close();
+
+    }
+
+    public static double getNumericCellValue(int row, int cell, String file) throws IOException {
+        XSSFWorkbook myExcelBook = new XSSFWorkbook(new FileInputStream(file));
+        Sheet myExcelSheet = myExcelBook.getSheet("Отчет");
+        Row sheetRow = myExcelSheet.getRow(row);
+        var v=sheetRow.getCell(cell).getNumericCellValue();
+        return v;
 
     }
 

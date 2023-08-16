@@ -2,6 +2,7 @@ package com.example.practice.service;
 
 import com.example.practice.model.*;
 import com.example.practice.repository.LogRepository;
+import com.example.practice.util.ExcelFileWriter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,11 +14,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -257,4 +260,50 @@ class LogServiceTest {
     }
 
 
+    @Test
+    void generateLogExpectZeroDutyAndBooks() throws IOException {
+        logService.generateLog();
+        assertEquals(0,ExcelFileWriter.getNumericCellValue(0,1,"files/отчет по таймеру.xlsx"));
+        assertEquals(0,ExcelFileWriter.getNumericCellValue(1,1,"files/отчет по таймеру.xlsx"));
+    }
+
+    @Test
+    void generateLogExpectSomeDutyAndBooks() throws IOException {
+
+        Book it= new Book("Stephen King", Year.of(1986), "IT");
+        Book prideAndPrejudice= new Book("Jane Austen", Year.of(1813), "Pride and Prejudice");
+        Book winnie= new Book("Alan Alexander Milne", Year.of(1926), "Winnie-the-Pooh");
+        Book lordOfTheRing= new Book("John Ronald Reuel Tolkien", Year.of(1955), "The Lord of the Rings");
+        Mockito.when(passwordEncoder.encode("123")).thenReturn("`123");
+
+        Reader reader2 = Reader.builder()
+                .id(1L)
+                .email("2@example.com")
+                .role(Role.USER)
+                .password(passwordEncoder.encode("123"))
+                .firstname("Andrey")
+                .lastname("Andreev")
+                .isActive(true)
+                .build();
+
+
+        Log log4= new Log(lordOfTheRing, reader2);
+        log4.setIssueDate(LocalDate.MIN);
+
+        Log log3= new Log(winnie, reader2);
+        log3.setIssueDate(LocalDate.MIN);
+
+        Log log= new Log(prideAndPrejudice, reader2);
+        log.setIssueDate(LocalDate.MIN);
+
+        Log log2= (new Log(it, reader2));
+        log2.setIssueDate(LocalDate.MIN);
+
+
+        Mockito.when(repository.findAllByReturnedDate(null)).thenReturn(Set.of(log,log2,log3,log4));
+        logService.generateLog();
+
+        assertEquals(4,ExcelFileWriter.getNumericCellValue(0,1,"files/отчет по таймеру.xlsx"));
+        assertEquals(4,ExcelFileWriter.getNumericCellValue(1,1,"files/отчет по таймеру.xlsx"));
+    }
 }

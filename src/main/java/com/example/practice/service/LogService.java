@@ -32,6 +32,7 @@ public class LogService {
     @Value("${library.maxDays}")
     private static int MAX_DAYS;
 
+
     public LogService(LogRepository repository, BookService bookService, ReaderService readerService) {
         this.repository = repository;
         this.bookService = bookService;
@@ -114,7 +115,7 @@ public class LogService {
                 .collect(Collectors.toList());
     }
 
-    @Scheduled(fixedRate = 12*60*60*1000)
+    @Scheduled(fixedDelayString = "${delay}")
     @Async
     public void generateLog() throws IOException {
         ExcelFileWriter.generateSchedulerFile(repository.findAllByReturnedDate(null));
