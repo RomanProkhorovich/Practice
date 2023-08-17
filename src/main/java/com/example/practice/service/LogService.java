@@ -75,22 +75,20 @@ public class LogService {
         }
         throw new UserNotFoundException("Username not found");
     }
-    public List<Book> findAllBooksByReader(String email,HttpServletRequest req) {
-        var reader = readerService.findByEmail(email,req);
+    public List<Book> findAllBooksByReader(String email) {
+        var reader = readerService.findByEmail(email);
         return findAllBooksByReader(reader);
     }
 
 
 
-    public Log returnBookById(Long id,HttpServletRequest req) {
-        AuthUtil.getRolesFromAuthServer(req);
+    public Log returnBookById(Long id) {
         var log = findById(id).orElseThrow();
         log.setReturnedDate(LocalDate.now());
         return save(log);
     }
 
-    public Log issueBook(BookReaderKeys keys,HttpServletRequest req){
-        AuthUtil.getRolesFromAuthServer(req);
+    public Log issueBook(BookReaderKeys keys){
         var book=bookService.findById(keys.bookId).orElseThrow(()->new BookNotFoundException());
         var reader=readerService.findById(keys.readerId).orElseThrow(()->new UserNotFoundException());
         return save(new Log(book,reader));
@@ -110,29 +108,9 @@ public class LogService {
                         getDurationBetweenNowAndIssueDate(x.getIssueDate())))
                 .collect(Collectors.toList());
     }
-    public List<BookDuty> getAllReaderDutyAndSendEmail(Long id,HttpServletRequest req){
-        var res=getRolesFromAuthServer(req);
-        if (!res.isAuthenticated())
-            throw new UserNotFoundException();
-        Reader reader = readerService.findById(id).orElseThrow(
-                () -> new UserNotFoundException(String.format("user with id %d not found", id)
-                ));
-        var allDuty=getAllReaderDuty(reader);
-        String text;
-        String to;
-        String subject = "Просрочка";
-        for (var duty : allDuty) {
-            to = duty.getReader().getEmail();
-            text = "Здравствуйте! Напоминаем о необходимости сдать книгу!\n" +
-                    "Название:" + duty.getBook().toString() + " пенни: " + duty.getPenni();
 
-            mailSender.sendMessage(to, subject, text,req);
-        }
-        return allDuty;
-    }
 
-    public List<Log> getAllByMonth(Integer year, Month month, HttpServletRequest req) {
-        AuthUtil.checkAdminRole(req);
+    public List<Log> getAllByMonth(Integer year, Month month) {
         var start = LocalDate.of(year, month, 1);
         var end = LocalDate.of(year, month, start.lengthOfMonth());
         return repository.findAllByIssueDateBetween(start, end);
@@ -146,23 +124,7 @@ public class LogService {
                 .collect(Collectors.toList());
     }
 
-    public List<BookDuty> getAllAndSendEmail(HttpServletRequest req){
-        var res=getRolesFromAuthServer(req);
-        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
-            throw new UserNotFoundException();
-        List<BookDuty> allDuty = getAllDuty();
-        String text;
-        String to;
-        String subject = "Просрочка";
-        for (var duty : allDuty) {
-            to = duty.getReader().getEmail();
-            text = "Здравствуйте! Напоминаем о необходимости сдать книгу!\n" +
-                    "Название:" + duty.getBook().toString() + " пенни: " + duty.getPenni();
 
-            mailSender.sendMessage(to, subject, text,req);
-        }
-        return allDuty;
-    }
 
     @Scheduled(fixedDelayString = "${delay}")
     @Async

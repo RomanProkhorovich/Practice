@@ -2,31 +2,25 @@ package com.example.practice.controller;
 
 
 import com.example.practice.Dto.BookReaderKeys;
-import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.model.BookDuty;
 import com.example.practice.model.Log;
-import com.example.practice.model.Reader;
-import com.example.practice.service.LogService;
-import com.example.practice.service.ReaderService;
-import com.example.practice.util.AppMailSender;
+import com.example.practice.serviceForController.LogServiceForController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.example.practice.util.AuthUtil.getRolesFromAuthServer;
-
 @RestController
 @RequestMapping("/api/logs")
-@RequiredArgsConstructor
 public class LogController {
-    private final LogService logService;
-    private final ReaderService readerService;
-    private final AppMailSender mailSender;
+    private final LogServiceForController logService;
+
+    public LogController(LogServiceForController logService) {
+        this.logService = logService;
+    }
 
 
     @Operation(

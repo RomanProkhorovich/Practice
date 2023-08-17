@@ -29,17 +29,16 @@ public class ReaderService  {
     }
 
 
-    public Reader save(Reader reader,HttpServletRequest req) {
+    public Reader save(Reader reader) {
 
-        if (findByEmail(reader.getEmail(),req)!=null) {
+        if (findByEmail(reader.getEmail())!=null) {
             throw new UserAlreadyExistException(
                     String.format("User with email: '%s' already exist", reader.getEmail()));
         }
         return readerRepository.save(reader);
     }
 
-    public Reader findByEmail(String email,HttpServletRequest req) {
-        AuthUtil.checkAdminRole(req);
+    public Reader findByEmail(String email) {
         var a=readerRepository.findByEmail(email).orElseThrow(()->new UserNotFoundException());
         if (!a.getIsActive()){
             throw new UserNotFoundException(String.format("User with email %s not found", email));
@@ -49,12 +48,10 @@ public class ReaderService  {
     public Optional<Reader> findById(Long id) {
         return readerRepository.findById(id);
     }
-    public List<Reader> findAll(HttpServletRequest req){
-        AuthUtil.checkAdminRole(req);
+    public List<Reader> findAll(){
         return readerRepository.findAll();
     }
-    public List<Reader> findAllActive(HttpServletRequest req){
-        AuthUtil.checkAdminRole(req);
+    public List<Reader> findAllActive(){
         return readerRepository.findAllByIsActive(true);
     }
 
@@ -91,8 +88,8 @@ public class ReaderService  {
                 ()-> new UserNotFoundException(String.format("User with id: '%d' not found", id))
         ) .setIsActive(false);
     }
-    public void deleteByEmail(String email,HttpServletRequest req){
-        findByEmail(email,req).setIsActive(false);
+    public void deleteByEmail(String email){
+        findByEmail(email).setIsActive(false);
     }
 
 

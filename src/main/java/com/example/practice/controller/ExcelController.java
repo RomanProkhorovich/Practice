@@ -3,6 +3,7 @@ package com.example.practice.controller;
 import com.example.practice.Dto.ExcelDto;
 import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.service.LogService;
+import com.example.practice.serviceForController.LogServiceForController;
 import com.example.practice.util.ExcelFileWriter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,9 +20,9 @@ import static com.example.practice.util.AuthUtil.getRolesFromAuthServer;
 @RestController
 @RequestMapping("/api/excel")
 public class ExcelController {
-    private final LogService logService;
+    private final LogServiceForController logService;
 
-    public ExcelController( LogService logService) {
+    public ExcelController( LogServiceForController logService) {
         this.logService = logService;
     }
 

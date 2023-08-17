@@ -78,7 +78,7 @@ class ReaderServiceTest {
                 .isActive(true)
                 .build();
         Mockito.when(readerRepository.findByEmail("2@example.com")).thenReturn(Optional.ofNullable(reader2));
-        assertEquals(reader2, readerService.findByEmail("2@example.com").get());
+        assertEquals(reader2, readerService.findByEmail("2@example.com"));
     }
 
     @Test

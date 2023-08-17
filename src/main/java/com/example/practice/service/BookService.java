@@ -4,16 +4,11 @@ import com.example.practice.exception.BookAlreadyExist;
 import com.example.practice.exception.BookNotFoundException;
 import com.example.practice.model.Book;
 import com.example.practice.repository.BookRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.Year;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static com.example.practice.util.AuthUtil.checkAdminRole;
 
 @Service
 public class BookService {
@@ -46,8 +41,7 @@ public class BookService {
     public List<Book> findAllNotArchived(){
         return bookRepository.findAllByArchived(false);
     }
-    public Book update(Book book, HttpServletRequest req){
-        checkAdminRole(req);
+    public Book update(Book book){
         var updated =findById(book.getId())
                 .orElseThrow(()-> new BookNotFoundException(String.format("Book with id: '%d' not found", book.getId())));
 
@@ -61,8 +55,7 @@ public class BookService {
         return save(updated);
     }
 
-    public Book deleteById(Long id,HttpServletRequest req){
-        checkAdminRole(req);
+    public Book deleteById(Long id){
         Book book = findById(id).orElseThrow(() -> new BookNotFoundException(String.format("Book with id: '%d' not found", id)));
         book.setArchived(true);
         return book;
