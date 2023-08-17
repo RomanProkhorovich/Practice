@@ -10,7 +10,6 @@ import com.example.practice.util.ExcelFileWriter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
@@ -68,7 +67,7 @@ public class LogService {
         else if (reader.getRole().equals(Role.ADMIN)) {
             return bookService.findAll();
         }
-        throw new UsernameNotFoundException("Username not found");
+        throw new UserNotFoundException("Username not found");
     }
     public List<Book> findAllBooksByReader(String email) {
         var reader = readerService.findByEmail(email).orElseThrow(UserNotFoundException::new);

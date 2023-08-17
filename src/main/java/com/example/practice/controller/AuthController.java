@@ -4,31 +4,23 @@ import com.example.practice.Dto.AuthDto;
 import com.example.practice.Dto.RegDto;
 import com.example.practice.Dto.Token;
 import com.example.practice.service.ReaderService;
-import com.example.practice.util.AuthUtil;
-import com.example.practice.util.JwtUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
     private final ReaderService readerService;
-    private final AuthUtil authUtil;
-    private final BCryptPasswordEncoder passwordEncoder;
 
-    public AuthController(ReaderService readerService, AuthUtil authUtil, BCryptPasswordEncoder passwordEncoder) {
+    public AuthController(ReaderService readerService) {
         this.readerService = readerService;
-        this.authUtil = authUtil;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Operation(
@@ -49,7 +41,12 @@ public class AuthController {
     )
     @PostMapping
     public ResponseEntity<Token> generateToken(@RequestBody AuthDto dto) {
-        return ResponseEntity.ok(new Token( authUtil.auth(dto.getUsername(),dto.getPassword())));
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpEntity<AuthDto> request = new HttpEntity<>(dto);
+        Token foo = restTemplate.postForObject("http://localhost:8081/auth", request, Token.class);
+        return ResponseEntity.ok(foo);
+      /*  return ResponseEntity.ok(new Token( authUtil.auth(dto.getUsername(),dto.getPassword())));*/
     }
 
 
@@ -71,7 +68,11 @@ public class AuthController {
     )
     @PostMapping("/registration")
     public ResponseEntity<AuthDto> doRegistration(@RequestBody RegDto regDto) {
+        RestTemplate restTemplate = new RestTemplate();
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(readerService.saveAndMap(regDto,passwordEncoder));
+        HttpEntity<RegDto> request = new HttpEntity<>(regDto);
+        AuthDto foo = restTemplate.postForObject("http://localhost:8081/auth/registration", request, AuthDto.class);
+        return ResponseEntity.ok(foo);
+        //return ResponseEntity.status(HttpStatus.CREATED).body(readerService.saveAndMap(regDto,passwordEncoder));
     }
 }

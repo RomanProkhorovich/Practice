@@ -1,5 +1,8 @@
 package com.example.practice.controller;
 
+import com.example.practice.Dto.AuthDto;
+import com.example.practice.Dto.RegDto;
+import com.example.practice.Dto.Response;
 import com.example.practice.exception.BookNotFoundException;
 import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.model.Book;
@@ -10,14 +13,15 @@ import com.example.practice.service.LogService;
 import com.example.practice.service.ReaderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.security.Principal;
 import java.util.List;
+
+import static com.example.practice.util.AuthUtil.getRolesFromAuthServer;
 
 @RestController
 @RequestMapping("/api/books")
@@ -42,8 +46,11 @@ public class BookController {
                     )
             })
     @GetMapping
-    public ResponseEntity<List<Book>> findAll(Principal userDetails) {
-        return ResponseEntity.ok(logService.findAllBooksByReader(userDetails.getName()));
+    public ResponseEntity<List<Book>> findAll(HttpServletRequest req) {
+
+
+        var response=getRolesFromAuthServer(req);
+        return ResponseEntity.ok(logService.findAllBooksByReader(response.getUsername()));
     }
 
 
@@ -62,7 +69,11 @@ public class BookController {
                     )
             })
     @GetMapping("/{id}")
-    public ResponseEntity<Book> findById(@PathVariable Long id) {
+    public ResponseEntity<Book> findById(@PathVariable Long id,HttpServletRequest req) {
+        var res=getRolesFromAuthServer(req);
+        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
+            throw new UserNotFoundException();
+
         var book = bookService.findById(id).orElseThrow(
                 () -> new BookNotFoundException(String.format("Book with id %d not found", id))
         );
@@ -81,7 +92,10 @@ public class BookController {
                     )
             })
     @GetMapping("/not_archived")
-    public ResponseEntity<List<Book>> findAllNotArchived() {
+    public ResponseEntity<List<Book>> findAllNotArchived(HttpServletRequest req) {
+        var res=getRolesFromAuthServer(req);
+        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
+            throw new UserNotFoundException();
         return ResponseEntity.ok(bookService.findAllNotArchived());
     }
 
@@ -101,7 +115,10 @@ public class BookController {
                     )
             })
     @PostMapping()
-    public ResponseEntity<Book> create(@RequestBody Book book) {
+    public ResponseEntity<Book> create(@RequestBody Book book,HttpServletRequest req) {
+        var res=getRolesFromAuthServer(req);
+        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
+            throw new UserNotFoundException();
         return ResponseEntity.status(HttpStatus.CREATED).body(bookService.save(book));
     }
 
@@ -121,7 +138,10 @@ public class BookController {
                     )
             })
     @PutMapping
-    public ResponseEntity<Book> update(@RequestBody Book book) {
+    public ResponseEntity<Book> update(@RequestBody Book book,HttpServletRequest req) {
+        var res=getRolesFromAuthServer(req);
+        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
+            throw new UserNotFoundException();
         return ResponseEntity.ok(bookService.update(book));
     }
 
@@ -141,9 +161,15 @@ public class BookController {
                     )
             })
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id,HttpServletRequest req) {
+        var res=getRolesFromAuthServer(req);
+        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
+            throw new UserNotFoundException();
+
         return ResponseEntity.ok(bookService.deleteById(id));
     }
+
+
 
 
 }

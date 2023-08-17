@@ -1,14 +1,18 @@
 package com.example.practice.controller;
 
 import com.example.practice.Dto.MailDto;
+import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.util.AppMailSender;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import static com.example.practice.util.AuthUtil.getRolesFromAuthServer;
 
 @RestController
 @RequestMapping("/api/mail")
@@ -33,7 +37,11 @@ public class MailController {
             }
     )
     @PostMapping
-    public ResponseEntity<String> sendEmail(@RequestBody MailDto dto ){
+    public ResponseEntity<String> sendEmail(@RequestBody MailDto dto, HttpServletRequest req){
+        var res=getRolesFromAuthServer(req);
+        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
+            throw new UserNotFoundException();
+
         mailSender.sendMessage(dto.getTo(), dto.getSubject(),dto.getText());
         return ResponseEntity.ok().body("Success");
     }

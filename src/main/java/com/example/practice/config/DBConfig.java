@@ -7,7 +7,6 @@ import com.example.practice.service.ReaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.Year;
@@ -15,7 +14,6 @@ import java.time.Year;
 @Configuration
 @RequiredArgsConstructor
 public class DBConfig {
-    private final BCryptPasswordEncoder passwordEncoder;
 
     private final BookService bookService;
 

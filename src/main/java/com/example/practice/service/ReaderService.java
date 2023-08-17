@@ -9,12 +9,6 @@ import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.mapper.ReaderMapper;
 import com.example.practice.model.Reader;
 import com.example.practice.repository.ReaderRepository;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class ReaderService implements UserDetailsService {
+public class ReaderService  {
 
     private final ReaderRepository readerRepository;
 
@@ -81,21 +75,7 @@ public class ReaderService implements UserDetailsService {
     }
 
 
-    public Reader save(RegDto regDto, PasswordEncoder passwordEncoder){
-        var password = regDto.getPassword();
-        Reader reader = Reader.builder()
-                .email(regDto.getEmail())
-                .firstname(regDto.getFirstname())
-                .lastname(regDto.getLastname())
-                .surname(regDto.getSurname())
-                .password(passwordEncoder.encode(password))
-                .build();
-        return save(reader);
-    }
-    public AuthDto saveAndMap(RegDto regDto, PasswordEncoder passwordEncoder){
-        Reader saved = save(regDto, passwordEncoder);
-        return new AuthDto(saved.getEmail(),saved.getPassword());
-    }
+
 
     public void deleteById(Long id){
         findById(id).orElseThrow(
@@ -108,16 +88,5 @@ public class ReaderService implements UserDetailsService {
         ) .setIsActive(false);
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        var reader=findByEmail(email).orElseThrow(()-> new UsernameNotFoundException(
-                String.format("User with email: '%s' not found", email)));
-        if (!reader.getIsActive()){
-            throw new DeletedUserException(String.format("user with email %s was deleted", email));
-        }
 
-        return new User(email,
-                reader.getPassword(),
-                Set.of(new SimpleGrantedAuthority(reader.getRole().name())));
-    }
 }

@@ -1,32 +1,22 @@
 package com.example.practice.util;
 
-import com.example.practice.exception.UserNotFoundException;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.stereotype.Service;
+import com.example.practice.Dto.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestTemplate;
 
-@Service
 public class AuthUtil {
-
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtils jwtUtils;
-
-    public AuthUtil(AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtils = jwtUtils;
-    }
-
-    public String auth(String username,String password){
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username,password)
-            );
-
-        } catch (BadCredentialsException e) {
-            throw new UserNotFoundException(String.format("User with email %s not found",password));
-        }
-
-        return jwtUtils.generateToken(username);
+    public static Response getRolesFromAuthServer(HttpServletRequest req){
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", req.getHeader("Authorization") );
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        HttpEntity<Response> response = restTemplate.exchange("http://localhost:8081/api/readers",
+                HttpMethod.GET,
+                request,
+                Response.class);
+        return response.getBody();
     }
 }

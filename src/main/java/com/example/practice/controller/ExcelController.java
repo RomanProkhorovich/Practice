@@ -1,16 +1,20 @@
 package com.example.practice.controller;
 
 import com.example.practice.Dto.ExcelDto;
+import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.service.LogService;
 import com.example.practice.util.ExcelFileWriter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Month;
+
+import static com.example.practice.util.AuthUtil.getRolesFromAuthServer;
 
 @RestController
 @RequestMapping("/api/excel")
@@ -34,7 +38,11 @@ public class ExcelController {
             }
     )
     @PostMapping
-    public ResponseEntity<?> generate(@RequestBody ExcelDto dto) {
+    public ResponseEntity<?> generate(@RequestBody ExcelDto dto, HttpServletRequest req) {
+        var res=getRolesFromAuthServer(req);
+        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
+            throw new UserNotFoundException();
+
         try {
             ExcelFileWriter.writeCountryListToFile(logService.getAllByMonth(dto.getYear(), Month.of(dto.getMonth())));
         } catch (Exception e) {

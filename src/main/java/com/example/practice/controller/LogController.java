@@ -11,11 +11,14 @@ import com.example.practice.service.ReaderService;
 import com.example.practice.util.AppMailSender;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.example.practice.util.AuthUtil.getRolesFromAuthServer;
 
 @RestController
 @RequestMapping("/api/logs")
@@ -39,7 +42,10 @@ public class LogController {
             }
     )
     @GetMapping
-    public ResponseEntity<List<BookDuty>> findAllDuty() {
+    public ResponseEntity<List<BookDuty>> findAllDuty(HttpServletRequest req) {
+        var res=getRolesFromAuthServer(req);
+        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
+            throw new UserNotFoundException();
         List<BookDuty> allDuty = logService.getAllDuty();
         String text;
         String to;
@@ -70,7 +76,10 @@ public class LogController {
             }
     )
     @GetMapping("/{userid}")
-    public ResponseEntity<List<BookDuty>> findAllDutyByReader(@PathVariable Long userid) {
+    public ResponseEntity<List<BookDuty>> findAllDutyByReader(@PathVariable Long userid,HttpServletRequest req) {
+        var res=getRolesFromAuthServer(req);
+        if (!res.isAuthenticated())
+            throw new UserNotFoundException();
         Reader reader = readerService.findById(userid).orElseThrow(
                 () -> new UserNotFoundException(String.format("user with id %d not found", userid)
                 ));
@@ -105,7 +114,11 @@ public class LogController {
             }
     )
     @DeleteMapping
-    public ResponseEntity<Log> returnBook(@RequestBody long id) {
+    public ResponseEntity<Log> returnBook(@RequestBody long id, HttpServletRequest req) {
+        var res=getRolesFromAuthServer(req);
+        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
+            throw new UserNotFoundException();
+
         var log = logService.returnBookById(id);
         return ResponseEntity.ok(log);
     }
@@ -127,7 +140,10 @@ public class LogController {
             }
     )
     @PostMapping
-    public ResponseEntity<Log> issueBook(@RequestBody BookReaderKeys dto) {
+    public ResponseEntity<Log> issueBook(@RequestBody BookReaderKeys dto, HttpServletRequest req) {
+        var res=getRolesFromAuthServer(req);
+        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
+            throw new UserNotFoundException();
         return ResponseEntity.ok(logService.issueBook(dto));
     }
 
