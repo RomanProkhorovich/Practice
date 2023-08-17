@@ -40,8 +40,8 @@ public class ReaderController {
             }
     )
     @GetMapping
-    public ResponseEntity<List<Reader>> findAll() {
-        return ResponseEntity.ok(readerService.findAll());
+    public ResponseEntity<List<Reader>> findAll(HttpServletRequest req) {
+        return ResponseEntity.ok(readerService.findAll(req));
     }
 
 
@@ -59,8 +59,8 @@ public class ReaderController {
     )
 
     @GetMapping("/active")
-    public ResponseEntity<List<Reader>> findAllActive() {
-        return ResponseEntity.ok(readerService.findAllActive());
+    public ResponseEntity<List<Reader>> findAllActive(HttpServletRequest req) {
+        return ResponseEntity.ok(readerService.findAllActive(req));
     }
 
 
@@ -83,11 +83,9 @@ public class ReaderController {
             }
     )
     @GetMapping("/{email}")
-    public ResponseEntity<Reader> findByEmail(@PathVariable String email) {
-        var a =readerService.findByEmail(email).orElseThrow(()->new UserNotFoundException(String.format("User with email %s not found", email)));
-        if (!a.getIsActive()){
-            throw new UserNotFoundException(String.format("User with email %s not found", email));
-        }
+    public ResponseEntity<Reader> findByEmail(@PathVariable String email,HttpServletRequest req) {
+        var a =readerService.findByEmail(email,req);
+
         return ResponseEntity.ok(a);
     }
 

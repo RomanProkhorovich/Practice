@@ -21,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import java.security.Principal;
 import java.util.List;
 
+import static com.example.practice.util.AuthUtil.checkAdminRole;
 import static com.example.practice.util.AuthUtil.getRolesFromAuthServer;
 
 @RestController
@@ -49,8 +50,7 @@ public class BookController {
     public ResponseEntity<List<Book>> findAll(HttpServletRequest req) {
 
 
-        var response=getRolesFromAuthServer(req);
-        return ResponseEntity.ok(logService.findAllBooksByReader(response.getUsername()));
+        return ResponseEntity.ok(logService.findAllBooksByReader(getRolesFromAuthServer(req).getUsername(),req));
     }
 
 
@@ -139,10 +139,8 @@ public class BookController {
             })
     @PutMapping
     public ResponseEntity<Book> update(@RequestBody Book book,HttpServletRequest req) {
-        var res=getRolesFromAuthServer(req);
-        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
-            throw new UserNotFoundException();
-        return ResponseEntity.ok(bookService.update(book));
+
+        return ResponseEntity.ok(bookService.update(book,req));
     }
 
 
@@ -162,11 +160,8 @@ public class BookController {
             })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id,HttpServletRequest req) {
-        var res=getRolesFromAuthServer(req);
-        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
-            throw new UserNotFoundException();
 
-        return ResponseEntity.ok(bookService.deleteById(id));
+        return ResponseEntity.ok(bookService.deleteById(id,req));
     }
 
 

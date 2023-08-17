@@ -9,6 +9,8 @@ import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.mapper.ReaderMapper;
 import com.example.practice.model.Reader;
 import com.example.practice.repository.ReaderRepository;
+import com.example.practice.util.AuthUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,25 +29,32 @@ public class ReaderService  {
     }
 
 
-    public Reader save(Reader reader) {
+    public Reader save(Reader reader,HttpServletRequest req) {
 
-        if (findByEmail(reader.getEmail()).isPresent()) {
+        if (findByEmail(reader.getEmail(),req)!=null) {
             throw new UserAlreadyExistException(
                     String.format("User with email: '%s' already exist", reader.getEmail()));
         }
         return readerRepository.save(reader);
     }
 
-    public Optional<Reader> findByEmail(String email) {
-        return readerRepository.findByEmail(email);
+    public Reader findByEmail(String email,HttpServletRequest req) {
+        AuthUtil.checkAdminRole(req);
+        var a=readerRepository.findByEmail(email).orElseThrow(()->new UserNotFoundException());
+        if (!a.getIsActive()){
+            throw new UserNotFoundException(String.format("User with email %s not found", email));
+        }
+        return a ;
     }
     public Optional<Reader> findById(Long id) {
         return readerRepository.findById(id);
     }
-    public List<Reader> findAll(){
+    public List<Reader> findAll(HttpServletRequest req){
+        AuthUtil.checkAdminRole(req);
         return readerRepository.findAll();
     }
-    public List<Reader> findAllActive(){
+    public List<Reader> findAllActive(HttpServletRequest req){
+        AuthUtil.checkAdminRole(req);
         return readerRepository.findAllByIsActive(true);
     }
 
@@ -82,10 +91,8 @@ public class ReaderService  {
                 ()-> new UserNotFoundException(String.format("User with id: '%d' not found", id))
         ) .setIsActive(false);
     }
-    public void deleteByEmail(String email){
-        findByEmail(email).orElseThrow(
-                ()-> new UserNotFoundException(String.format("User with email: '%s' not found", email))
-        ) .setIsActive(false);
+    public void deleteByEmail(String email,HttpServletRequest req){
+        findByEmail(email,req).setIsActive(false);
     }
 
 

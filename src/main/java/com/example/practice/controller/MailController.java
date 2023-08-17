@@ -38,11 +38,8 @@ public class MailController {
     )
     @PostMapping
     public ResponseEntity<String> sendEmail(@RequestBody MailDto dto, HttpServletRequest req){
-        var res=getRolesFromAuthServer(req);
-        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
-            throw new UserNotFoundException();
 
-        mailSender.sendMessage(dto.getTo(), dto.getSubject(),dto.getText());
+        mailSender.sendMessage(dto.getTo(), dto.getSubject(),dto.getText(),req);
         return ResponseEntity.ok().body("Success");
     }
 }

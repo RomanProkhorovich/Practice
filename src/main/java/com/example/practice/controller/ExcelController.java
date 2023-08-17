@@ -39,12 +39,10 @@ public class ExcelController {
     )
     @PostMapping
     public ResponseEntity<?> generate(@RequestBody ExcelDto dto, HttpServletRequest req) {
-        var res=getRolesFromAuthServer(req);
-        if (!res.isAuthenticated()|| !res.getRole().equals("ADMIN"))
-            throw new UserNotFoundException();
+
 
         try {
-            ExcelFileWriter.writeCountryListToFile(logService.getAllByMonth(dto.getYear(), Month.of(dto.getMonth())));
+            ExcelFileWriter.writeCountryListToFile(logService.getAllByMonth(dto.getYear(), Month.of(dto.getMonth()),req));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

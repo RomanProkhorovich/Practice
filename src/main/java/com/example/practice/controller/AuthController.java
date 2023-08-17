@@ -4,6 +4,7 @@ import com.example.practice.Dto.AuthDto;
 import com.example.practice.Dto.RegDto;
 import com.example.practice.Dto.Token;
 import com.example.practice.service.ReaderService;
+import com.example.practice.util.AuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.HttpEntity;
@@ -14,14 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import static com.example.practice.util.AuthUtil.doReg;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    private final ReaderService readerService;
 
-    public AuthController(ReaderService readerService) {
-        this.readerService = readerService;
-    }
+
 
     @Operation(
             method = "GET",
@@ -41,12 +41,8 @@ public class AuthController {
     )
     @PostMapping
     public ResponseEntity<Token> generateToken(@RequestBody AuthDto dto) {
-        RestTemplate restTemplate = new RestTemplate();
 
-        HttpEntity<AuthDto> request = new HttpEntity<>(dto);
-        Token foo = restTemplate.postForObject("http://localhost:8081/auth", request, Token.class);
-        return ResponseEntity.ok(foo);
-      /*  return ResponseEntity.ok(new Token( authUtil.auth(dto.getUsername(),dto.getPassword())));*/
+        return ResponseEntity.ok(AuthUtil.generateToken(dto));
     }
 
 
@@ -68,11 +64,6 @@ public class AuthController {
     )
     @PostMapping("/registration")
     public ResponseEntity<AuthDto> doRegistration(@RequestBody RegDto regDto) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpEntity<RegDto> request = new HttpEntity<>(regDto);
-        AuthDto foo = restTemplate.postForObject("http://localhost:8081/auth/registration", request, AuthDto.class);
-        return ResponseEntity.ok(foo);
-        //return ResponseEntity.status(HttpStatus.CREATED).body(readerService.saveAndMap(regDto,passwordEncoder));
+        return ResponseEntity.ok(doReg(regDto));
     }
 }
