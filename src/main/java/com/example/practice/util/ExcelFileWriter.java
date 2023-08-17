@@ -3,20 +3,69 @@ package com.example.practice.util;
 import com.example.practice.model.BookDuty;
 import com.example.practice.model.Log;
 import com.example.practice.service.LogService;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.time.LocalDate;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ExcelFileWriter {
+
+    public static void generateSchedulerFile(Set<Log> issuedAndNotReturnedBooks) throws IOException {
+        var workbook = new XSSFWorkbook();
+
+        Sheet sheet = workbook.createSheet("Отчет");
+        Row row = sheet.createRow(0);
+        Cell cell= row.createCell(0);
+        cell.setCellValue("Количество выданных книг:");
+        row.createCell(1).setCellValue(issuedAndNotReturnedBooks.size());
+
+        var duties = issuedAndNotReturnedBooks.stream().filter(LogService::checkIsDuty).collect(Collectors.toSet());
+        var readers=duties.stream().map(Log::getReader).collect(Collectors.toSet());
+        Row row1= sheet.createRow(1);
+        row1.createCell(0).setCellValue("Количство должников:");
+        row1.createCell(1).setCellValue(readers.size());
+        sheet.createRow(2).createCell(0).setCellValue("Должники:");
+
+        int rowCount=3;
+        for (var item:readers){
+            var dutyRow=sheet.createRow(rowCount);
+            dutyRow.createCell(0).setCellValue(item.getLastname());
+            dutyRow.createCell(1).setCellValue(item.getFirstname());
+            dutyRow.createCell(2).setCellValue(item.getSurname());
+
+            rowCount++;
+        }
+
+        sheet.autoSizeColumn(0);
+        sheet.autoSizeColumn(1);
+        sheet.autoSizeColumn(2);
+        String filename="отчет по таймеру";
+        FileOutputStream fos = new FileOutputStream("files/" + filename +".xlsx");
+        workbook.write(fos);
+        fos.close();
+
+    }
+
+    public static double getNumericCellValue(int row, int cell, String file) throws IOException {
+        XSSFWorkbook myExcelBook = new XSSFWorkbook(new FileInputStream(file));
+        Sheet myExcelSheet = myExcelBook.getSheet("Отчет");
+        Row sheetRow = myExcelSheet.getRow(row);
+        var v=sheetRow.getCell(cell).getNumericCellValue();
+        return v;
+
+    }
 
     public static void writeCountryListToFile(List<Log> logs) throws Exception {
 

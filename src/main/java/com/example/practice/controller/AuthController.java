@@ -3,38 +3,25 @@ package com.example.practice.controller;
 import com.example.practice.Dto.AuthDto;
 import com.example.practice.Dto.RegDto;
 import com.example.practice.Dto.Token;
-import com.example.practice.exception.UserNotFoundException;
-import com.example.practice.model.Reader;
 import com.example.practice.service.ReaderService;
-import com.example.practice.util.JwtUtils;
+import com.example.practice.util.AuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import static com.example.practice.util.AuthUtil.doReg;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    private final JwtUtils jwtUtils;
-    private final ReaderService readerService;
-    private final AuthenticationManager authenticationManager;
-    private final BCryptPasswordEncoder passwordEncoder;
 
-    public AuthController(JwtUtils jwtUtils, ReaderService readerService, AuthenticationManager authenticationManager, BCryptPasswordEncoder passwordEncoder) {
-        this.jwtUtils = jwtUtils;
-        this.readerService = readerService;
-        this.authenticationManager = authenticationManager;
-        this.passwordEncoder = passwordEncoder;
-    }
+
 
     @Operation(
             method = "GET",
@@ -54,15 +41,8 @@ public class AuthController {
     )
     @PostMapping
     public ResponseEntity<Token> generateToken(@RequestBody AuthDto dto) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword())
-            );
-        } catch (BadCredentialsException e) {
-            throw new UserNotFoundException(String.format("User with email %s not found", dto.getUsername()));
-        }
-        UserDetails user = readerService.loadUserByUsername(dto.getUsername());
-        return ResponseEntity.ok(new Token(jwtUtils.generateToken(user)));
+
+        return ResponseEntity.ok(AuthUtil.generateToken(dto));
     }
 
 
@@ -84,15 +64,6 @@ public class AuthController {
     )
     @PostMapping("/registration")
     public ResponseEntity<AuthDto> doRegistration(@RequestBody RegDto regDto) {
-        var password = regDto.getPassword();
-        Reader reader = Reader.builder()
-                .email(regDto.getEmail())
-                .firstname(regDto.getFirstname())
-                .lastname(regDto.getLastname())
-                .surname(regDto.getSurname())
-                .password(passwordEncoder.encode(password))
-                .build();
-        readerService.save(reader);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new AuthDto(regDto.getEmail(), regDto.getPassword()));
+        return ResponseEntity.ok(doReg(regDto));
     }
 }

@@ -3,28 +3,28 @@ package com.example.practice.controller;
 import com.example.practice.exception.IllegalEmailException;
 import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.model.Reader;
-import com.example.practice.service.ReaderService;
+import com.example.practice.serviceForController.ReaderServiceForController;
+import com.example.practice.util.AuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+
+import static com.example.practice.util.AuthUtil.getRolesFromAuthServer;
 
 @RestController
 @RequestMapping("/api/readers")
 public class ReaderController {
-    private final ReaderService readerService;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final ReaderServiceForController readerService;
 
-    public ReaderController(ReaderService readerService, BCryptPasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
+    public ReaderController(ReaderServiceForController readerService) {
         this.readerService = readerService;
     }
-
 
 
     @Operation(
@@ -39,10 +39,9 @@ public class ReaderController {
             }
     )
     @GetMapping
-    public ResponseEntity<List<Reader>> findAll() {
-        return ResponseEntity.ok(readerService.findAll());
+    public ResponseEntity<List<Reader>> findAll(HttpServletRequest req) {
+        return ResponseEntity.ok(readerService.findAll(req));
     }
-
 
 
     @Operation(
@@ -58,12 +57,9 @@ public class ReaderController {
     )
 
     @GetMapping("/active")
-    public ResponseEntity<List<Reader>> findAllActive() {
-        return ResponseEntity.ok(readerService.findAllActive());
+    public ResponseEntity<List<Reader>> findAllActive(HttpServletRequest req) {
+        return ResponseEntity.ok(readerService.findAllActive(req));
     }
-
-
-
 
 
     @Operation(
@@ -82,15 +78,11 @@ public class ReaderController {
             }
     )
     @GetMapping("/{email}")
-    public ResponseEntity<Reader> findByEmail(@PathVariable String email) {
-        var a =readerService.findByEmail(email).orElseThrow(()->new UserNotFoundException(String.format("User with email %s not found", email)));
-        if (!a.getIsActive()){
-            throw new UserNotFoundException(String.format("User with email %s not found", email));
-        }
+    public ResponseEntity<Reader> findByEmail(@PathVariable String email, HttpServletRequest req) {
+        var a = readerService.findByEmail(email, req);
+
         return ResponseEntity.ok(a);
     }
-
-
 
 
     @Operation(
@@ -109,9 +101,9 @@ public class ReaderController {
             }
     )
     @PutMapping
-    public ResponseEntity<Reader> update(@RequestBody Reader reader) {
-        reader.setPassword(passwordEncoder.encode(reader.getPassword()));
-        return ResponseEntity.ok(readerService.update(reader));
+    public ResponseEntity<Reader> update(@RequestBody Reader reader, HttpServletRequest req) {
+
+        return ResponseEntity.ok(AuthUtil.updateInAuthServer(reader,req));
     }
 
 
@@ -131,8 +123,9 @@ public class ReaderController {
             }
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
-        readerService.deleteById(id);
+    public ResponseEntity<String> delete(@PathVariable Long id, HttpServletRequest req) {
+
+        readerService.deleteById(id, req);
         return ResponseEntity.ok("User deleted successfully");
     }
 
@@ -153,16 +146,11 @@ public class ReaderController {
             }
     )
     @PostMapping
-    public ResponseEntity<Reader> create(@RequestBody Reader reader) {
-        validateEmail(reader.getEmail());
-        reader.setPassword(passwordEncoder.encode(reader.getPassword()));
-        return ResponseEntity.status(HttpStatus.CREATED).body(readerService.save(reader));
-    }
+    public ResponseEntity<Reader> create(@RequestBody Reader reader, HttpServletRequest req) {
 
-    private void validateEmail(String email) {
-        if (!EmailValidator.getInstance().isValid(email)) {
-            throw new IllegalEmailException(String.format("Email %s is invalid", email));
-        }
+        return ResponseEntity.ok(AuthUtil.saveReaderIntoAuthServer(reader, req));
     }
 
 }
+
+

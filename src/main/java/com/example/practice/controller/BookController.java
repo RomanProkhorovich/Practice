@@ -3,34 +3,29 @@ package com.example.practice.controller;
 import com.example.practice.exception.BookNotFoundException;
 import com.example.practice.exception.UserNotFoundException;
 import com.example.practice.model.Book;
-import com.example.practice.model.Reader;
-import com.example.practice.model.Role;
-import com.example.practice.service.BookService;
-import com.example.practice.service.LogService;
-import com.example.practice.service.ReaderService;
+import com.example.practice.serviceForController.BookServiceForController;
+import com.example.practice.serviceForController.LogServiceForController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
+
+import static com.example.practice.util.AuthUtil.getRolesFromAuthServer;
 
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
-    private final BookService bookService;
-    private final ReaderService readerService;
-    private final LogService logService;
+    private final BookServiceForController bookService;
+    private final LogServiceForController logService;
 
-    public BookController(BookService bookService, ReaderService readerService, LogService logService) {
+    public BookController(BookServiceForController bookService, LogServiceForController logService) {
         this.bookService = bookService;
-        this.readerService = readerService;
         this.logService = logService;
     }
+
 
     @Operation(
             method = "GET",
@@ -44,15 +39,10 @@ public class BookController {
                     )
             })
     @GetMapping
-    public ResponseEntity<List<Book>> findAll(Principal userDetails) {
-        var reader = readerService.findByEmail(userDetails.getName()).orElseThrow(UserNotFoundException::new);
-        Role role = reader.getRole();
-        if (role.equals(Role.USER)) {
-            return getAllUserBooks(reader);
-        } else if (role.equals(Role.ADMIN)) {
-            return getAllBooks();
-        }
-        throw new RuntimeException();
+    public ResponseEntity<List<Book>> findAll(HttpServletRequest req) {
+
+
+        return ResponseEntity.ok(logService.findAllBooksByReader(getRolesFromAuthServer(req).getUsername(),req));
     }
 
 
@@ -71,11 +61,10 @@ public class BookController {
                     )
             })
     @GetMapping("/{id}")
-    public ResponseEntity<Book> findById(@PathVariable long id) {
-        var book = bookService.findById(id).orElseThrow(
-                () -> new BookNotFoundException(String.format("Book with id %d not found", id))
-        );
-        return ResponseEntity.ok(book);
+    public ResponseEntity<Book> findById(@PathVariable Long id,HttpServletRequest req) {
+
+
+        return ResponseEntity.ok(bookService.findById(id,req));
     }
 
 
@@ -90,10 +79,9 @@ public class BookController {
                     )
             })
     @GetMapping("/not_archived")
-    public ResponseEntity<List<Book>> findAllNotArchived() {
-        return ResponseEntity.ok(bookService.findAllNotArchived());
+    public ResponseEntity<List<Book>> findAllNotArchived(HttpServletRequest req) {
+        return ResponseEntity.ok(bookService.findAllNotArchived(req));
     }
-
 
 
     @Operation(
@@ -111,10 +99,10 @@ public class BookController {
                     )
             })
     @PostMapping()
-    public ResponseEntity<Book> create(@RequestBody Book book) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.save(book));
-    }
+    public ResponseEntity<Book> create(@RequestBody Book book,HttpServletRequest req) {
 
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.save(book,req));
+    }
 
 
     @Operation(
@@ -132,10 +120,10 @@ public class BookController {
                     )
             })
     @PutMapping
-    public ResponseEntity<Book> update(@RequestBody Book book) {
-        return ResponseEntity.ok(bookService.update(book));
-    }
+    public ResponseEntity<Book> update(@RequestBody Book book,HttpServletRequest req) {
 
+        return ResponseEntity.ok(bookService.update(book,req));
+    }
 
 
     @Operation(
@@ -153,22 +141,12 @@ public class BookController {
                     )
             })
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable long id) {
-        return ResponseEntity.ok(bookService.deleteById(id));
+    public ResponseEntity<?> delete(@PathVariable Long id,HttpServletRequest req) {
+
+        return ResponseEntity.ok(bookService.deleteById(id,req));
     }
 
 
-    private ResponseEntity<List<Book>> getAllBooks() {
-        List<Book> books;
-        books = bookService.findAll();
-        return ResponseEntity.ok(books);
-    }
-
-    private ResponseEntity<List<Book>> getAllUserBooks(Reader reader) {
-        List<Book> books;
-        books = logService.findAllBooksByReader(reader);
-        return ResponseEntity.ok(books);
-    }
 
 
 }

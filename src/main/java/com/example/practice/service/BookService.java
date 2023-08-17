@@ -7,10 +7,8 @@ import com.example.practice.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Year;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -41,10 +39,7 @@ public class BookService {
     }
 
     public List<Book> findAllNotArchived(){
-        return bookRepository.findAll().
-                stream()
-                .filter(x-> !x.getArchived())
-                .collect(Collectors.toList());
+        return bookRepository.findAllByArchived(false);
     }
     public Book update(Book book){
         var updated =findById(book.getId())

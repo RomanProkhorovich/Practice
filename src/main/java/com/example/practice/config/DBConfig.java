@@ -7,7 +7,6 @@ import com.example.practice.service.ReaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.Year;
@@ -15,13 +14,12 @@ import java.time.Year;
 @Configuration
 @RequiredArgsConstructor
 public class DBConfig {
-    private final BCryptPasswordEncoder passwordEncoder;
 
     private final BookService bookService;
 
     private final ReaderService readerService;
     private final LogService logService;
-    @Bean
+  /*  @Bean
     public void init(){
         Book it= new Book("Stephen King", Year.of(1986), "IT");
         Book prideAndPrejudice= new Book("Jane Austen", Year.of(1813), "Pride and Prejudice");
@@ -56,11 +54,5 @@ public class DBConfig {
         // Log log= logService.save(new Log(it,reader2, LocalDate.now()));
 
 
-        Log log2= logService.save(new Log(it, reader2));
-
-       /* Log log1= logService.save(new Log(winnie,reader2, LocalDate.now()));
-
-        Log log2= logService.save(new Log(lordOfTheRing,reader2, LocalDate.now()));*/
-
-    }
+    }*/
 }
